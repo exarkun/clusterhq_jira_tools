@@ -22,8 +22,10 @@ def priority(issue):
 def main():
     c = jc.JIRA({"server": "https://clusterhq.atlassian.net/"})
 
-    issues = []
-    query = 'type != "Story" and status in ("Design Review Ready", "Code Review Ready")'
+    query = (
+        'type != "Story" and '
+        'status in ("Design Review Ready", "Code Review Ready")'
+    )
     issues = list(c.search_issues(query))
     issues.sort(key=priority)
     for issue in issues:
