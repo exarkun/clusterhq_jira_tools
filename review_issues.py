@@ -9,18 +9,11 @@ if __name__ == '__main__':
     from review_issues import main
     raise SystemExit(main(*argv[1:]))
 
-import jira.client as jc
-
-
-def priority(issue):
-    for i in range(1, 5):
-        if "prio{}".format(i) in issue.fields.labels:
-            return -i
-    return 0
+from issuelib import priority, client
 
 
 def main():
-    c = jc.JIRA({"server": "https://clusterhq.atlassian.net/"})
+    c = client()
 
     query = (
         'type != "Story" and '

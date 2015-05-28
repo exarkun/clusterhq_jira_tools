@@ -9,16 +9,17 @@ if __name__ == '__main__':
 from datetime import datetime, timedelta
 
 from dateutil.parser import parse as parse_datetime
-import jira.client as jc
 
 from pytz import utc
+
+from issuelib import client
 
 
 def main(username="exarkun"):
     username = username.decode("ascii")
     now = datetime.now(tz=utc)
 
-    c = jc.JIRA({"server": "https://clusterhq.atlassian.net/"})
+    c = client()
 
     RECENT_ISSUES = (
         '(issuetype = Bug or issuetype != Bug) and '
