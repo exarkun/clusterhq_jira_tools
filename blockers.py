@@ -49,6 +49,22 @@ def build_issue_graph(client, issue):
     return g
 
 
+def filter_edges(predicate, graph):
+    """
+    Create a graph based on 'graph', but only with edges that match
+    'predicate'.
+
+    Any nodes that are no longer connected will also be removed.
+    """
+    nonmatching_edges = (
+        (src, dst) for (src, dst) in graph.edges()
+        if not predicate(graph[src][dst]))
+    new_graph = graph.copy()
+    new_graph.remove_edges_from(nonmatching_edges)
+    new_graph.remove_nodes_from(networkx.isolates(new_graph))
+    return new_graph
+
+
 if __name__ == '__main__':
     client = issuelib.client()
     # XXX: IO
