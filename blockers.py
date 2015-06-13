@@ -67,30 +67,31 @@ def filter_edges(predicate, graph):
 
 def descendants_dag(graph, root):
     # XXX: There must be a standard name for this sort of thing.
-    if not networkx.is_directed_acyclic_graph(graph):
-        raise ValueError('%r is not DAG' % (graph,))
+    assert_dag(graph)
     descs = networkx.descendants(graph, root)
     non_descs = set(graph.nodes()) - descs
     non_descs.remove(root)
     new_graph = graph.copy()
     new_graph.remove_nodes_from(non_descs)
-    if not networkx.is_directed_acyclic_graph(new_graph):
-        raise AssertionError('Expected %r to be a DAG' % (new_graph,))
+    assert_dag(graph)
     return new_graph
 
 
 def ancestors_dag(graph, root):
     # XXX: This is a clone of descendants_dag. :(
-    if not networkx.is_directed_acyclic_graph(graph):
-        raise ValueError('%r is not DAG' % (graph,))
+    assert_dag(graph)
     ancestors = networkx.ancestors(graph, root)
     non_ancestors = set(graph.nodes()) - ancestors
     non_ancestors.remove(root)
     new_graph = graph.copy()
     new_graph.remove_nodes_from(non_ancestors)
-    if not networkx.is_directed_acyclic_graph(new_graph):
-        raise AssertionError('Expected %r to be a DAG' % (new_graph,))
+    assert_dag(new_graph)
     return new_graph
+
+
+def assert_dag(graph):
+    if not networkx.is_directed_acyclic_graph(graph):
+        raise AssertionError('Expected %r to be a DAG' % (graph,))
 
 
 if __name__ == '__main__':
