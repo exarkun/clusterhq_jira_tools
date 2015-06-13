@@ -2,6 +2,7 @@
 Understand what's blocking an issue.
 """
 
+import itertools
 import networkx
 
 import issuelib
@@ -107,17 +108,44 @@ def dfs_predecessor_tree(graph, root):
     return _dfs_tree(root, graph.predecessors)
 
 
-def print_tree(node, get_children):
-    FORK = u'\u251c'
-    LAST = u'\u2514'
-    VERTICAL = u'\u2502'
-    HORIZONTAL = u'\u2500'
-    print node
+# These have been factored out into jml/tree-fonmat.
+
+FORK = u'\u251c'
+LAST = u'\u2514'
+VERTICAL = u'\u2502'
+HORIZONTAL = u'\u2500'
+
+
+def _format_tree(node, format_node, get_children, prefix=''):
     children = get_children(node)
+    next_prefix = u''.join([prefix, VERTICAL, u'   '])
     for child in children[:-1]:
-        print ''.join([FORK, HORIZONTAL, HORIZONTAL, ' ', child])
+        yield u''.join(
+            [prefix, FORK, HORIZONTAL, HORIZONTAL, u' ', format_node(child)])
+        results = _format_tree(child, format_node, get_children, next_prefix)
+        for result in results:
+            yield result
     if children:
-        print ''.join([LAST, HORIZONTAL, HORIZONTAL, ' ', children[-1]])
+        last_prefix = u''.join([prefix, u'    '])
+        last = children[-1]
+        yield u''.join(
+            [prefix, LAST, HORIZONTAL, HORIZONTAL, u' ', format_node(last)])
+        results = _format_tree(last, format_node, get_children, last_prefix)
+        for result in results:
+            yield result
+
+
+def format_tree(node, format_node, get_children):
+    lines = itertools.chain(
+        [format_node(node)],
+        _format_tree(node, format_node, get_children),
+        [u''],
+    )
+    return u'\n'.join(lines)
+
+
+def print_tree(node, get_children):
+    print format_tree(node, str, get_children)
 
 
 def load_graph_from_jira(issue_key):
