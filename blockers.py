@@ -94,8 +94,32 @@ def assert_dag(graph):
         raise AssertionError('Expected %r to be a DAG' % (graph,))
 
 
-if __name__ == '__main__':
-    issue_key = 'FLOC-2008'
+def _dfs_tree(root, get_children, level=0):
+    children = get_children(root)
+    yield root, level, children
+    for child in children:
+        for result in _dfs_tree(child, get_children, level + 1):
+            yield result
+
+
+def dfs_predecessor_tree(graph, root):
+    assert_dag(graph)
+    return _dfs_tree(root, graph.predecessors)
+
+
+def print_tree(node, get_children):
+    FORK = u'\u251c'
+    LAST = u'\u2514'
+    VERTICAL = u'\u2502'
+    HORIZONTAL = u'\u2500'
+    print node
+    children = get_children(node)
+    for child in children[:-1]:
+        print ''.join([FORK, HORIZONTAL, HORIZONTAL, ' ', child])
+    if children:
+        print ''.join([LAST, HORIZONTAL, HORIZONTAL, ' ', children[-1]])
+
+
 def load_graph_from_jira(issue_key):
     client = issuelib.client()
     # XXX: IO
