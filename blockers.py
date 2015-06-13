@@ -96,10 +96,21 @@ def assert_dag(graph):
 
 if __name__ == '__main__':
     issue_key = 'FLOC-2008'
+def load_graph_from_jira(issue_key):
     client = issuelib.client()
     # XXX: IO
     base_issue = client.issue(issue_key)
-    g = build_issue_graph(client, base_issue)
+    return build_issue_graph(client, base_issue)
+
+
+def load_graph_from_file(path):
+    return networkx.read_gpickle(path)
+
+
+if __name__ == '__main__':
+    issue_key = 'FLOC-2008'
+    #g = load_graph_from_jira(issue_key)
+    g = load_graph_from_file('FLOC-2008-closure.gpickle')
     # XXX: Useful to be able to save at this point for later processing:
     # networkx.write_gpickle(g, 'FLOC-2008-closure.pickle')
     g = filter_edges(lambda x: x.get('link_type') == 'Blocks', g)
