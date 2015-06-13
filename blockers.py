@@ -40,9 +40,9 @@ def build_issue_graph(client, issue):
             g.add_node(dest_key, issue=dest.raw)
             link_type = link.type.name
             if outward:
-                g.add_edge(dest_key, head.key, link_type=link_type)
-            else:
                 g.add_edge(head.key, dest_key, link_type=link_type)
+            else:
+                g.add_edge(dest_key, head.key, link_type=link_type)
 
         seen[head.key] = head
 
