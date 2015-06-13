@@ -2,6 +2,7 @@
 Understand what's blocking an issue.
 """
 
+from functools import partial
 import itertools
 import networkx
 
@@ -144,8 +145,19 @@ def format_tree(node, format_node, get_children):
     return u'\n'.join(lines)
 
 
-def print_tree(node, get_children):
-    print format_tree(node, str, get_children)
+def format_issue(graph, node):
+    fields = graph.node[node]['issue']['fields']
+    assignee = fields['assignee']
+    if assignee:
+        assignee_text = u' ({})'.format(assignee['key'])
+    else:
+        assignee_text = ''
+    return u'{}: {} - {}{}'.format(
+        node, fields['summary'], fields['status']['name'], assignee_text)
+
+
+def print_tree(node, format_node, get_children):
+    print format_tree(node, format_node, get_children)
 
 
 def load_graph_from_jira(issue_key):
@@ -161,11 +173,10 @@ def load_graph_from_file(path):
 
 if __name__ == '__main__':
     issue_key = 'FLOC-2008'
-    #g = load_graph_from_jira(issue_key)
-    g = load_graph_from_file('FLOC-2008-closure.gpickle')
+    g = load_graph_from_jira(issue_key)
     # XXX: Useful to be able to save at this point for later processing:
     # networkx.write_gpickle(g, 'FLOC-2008-closure.pickle')
     g = filter_edges(lambda x: x.get('link_type') == 'Blocks', g)
     g = ancestors_dag(g, issue_key)
     # XXX: print this as a tree, highlighting nodes that appear more than once
-    print g
+    print_tree(issue_key, partial(format_issue, g), g.predecessors)
