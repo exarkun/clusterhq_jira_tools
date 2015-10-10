@@ -37,9 +37,9 @@ def build_issue_graph(client, issue):
             if dest_key not in seen:
                 # XXX: IO
                 dest = client.issue(dest_key)
+                g.add_node(dest_key, issue=dest.raw)
                 queue.append(dest)
 
-            g.add_node(dest_key, issue=dest.raw)
             link_type = link.type.name
             if outward:
                 g.add_edge(head.key, dest_key, link_type=link_type)
