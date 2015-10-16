@@ -2,6 +2,12 @@
 Understand what's blocking an issue.
 """
 
+
+if __name__ == '__main__':
+    from sys import argv
+    from blockers import main
+    raise SystemExit(main(*argv[1:]))
+
 from functools import partial
 import itertools
 import networkx
@@ -143,15 +149,10 @@ def print_tree(node, format_node, get_children):
     print format_tree(node, format_node, get_children)
 
 
-def main():
-    issue_key = 'FLOC-2008'
+def main(issue_key):
     client = issuelib.client()
     # XXX: IO
     base_issue = client.issue(issue_key)
     g = build_issue_graph(client, base_issue, follow_links=['Blocks'])
     g = ancestors_dag(g, issue_key)
     print_tree(issue_key, partial(format_issue, g), g.predecessors)
-
-
-if __name__ == '__main__':
-    main()
